@@ -9,25 +9,8 @@ CSV_FILE="sales.csv"
 if [ ! -f "$CSV_FILE" ]; then
   echo  "File doesn't exist:)"
 fi
-
-# Display the menu
-echo "Select an option:"
-echo "1. Display number of rows and columns"
-echo "2. List unique values in a specified column"
-echo "3. Display column names (header)"
-echo "4. Minimum and maximum values for numeric columns"
-echo "5. The most frequent value for categorical columns"
-echo "6. Calculating summary statistics (mean, median, standard deviation) for numeric columns"
-echo "7. Filtering and extracting rows and column based on user-defined conditions"
-echo "8. Sorting the CSV file based on a specific column"
-echo "0. Exit"
-
-# Get the user's choice
-read choice
-
-# Perform the selected operation
-case $choice in
-  1)
+#Functions to handle the menu options
+function option_1(){
 # Use awk to count rows and columns
 num_rows=$(awk 'END {print NR}' "$CSV_FILE")
 num_columns=$(awk -F',' 'NR==1 {print NF}' "$CSV_FILE")
@@ -35,8 +18,9 @@ num_columns=$(awk -F',' 'NR==1 {print NF}' "$CSV_FILE")
 # Display the results
 echo "Number of rows: $num_rows"
 echo "Number of columns: $num_columns"
-    ;;
-  2)
+}
+
+function option_2(){
 # Prompt the user to enter the column number
 read -p "Enter the column number: " column_number
 
@@ -46,16 +30,16 @@ unique_values=$(awk -F',' -v col="$column_number" 'NR>1 {print $col}' "$CSV_FILE
 # Display the unique values
 echo "Unique values in column $column_number:"
 echo "$unique_values"
-    ;;
-  3)
+}
+function option_3(){
 # Use awk to extract and display the header (first row)
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 
 # Display the column names (header)
 echo "Column names (header):"
 echo "$header"
-    ;;
-  4)
+}
+function option_4(){
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 
 # Initialize variables to store the column indices and numeric flags
@@ -77,8 +61,8 @@ for col_index in "${numeric_columns[@]}"; do
     min_max=$(awk -F',' -v col="$col_index" 'NR>1 {if (min=="") min=max=$col; if ($col<min) min=$col; if ($col>max) max=$col} END {print min, max}' "$CSV_FILE")
     echo "Column $col_index: Min = ${min_max%% *}, Max = ${min_max##* }"
 done
-    ;;
-  5)
+}
+function option_5(){
 # Use awk to extract column names (header)
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 
@@ -99,8 +83,8 @@ for col_index in "${categorical_columns[@]}"; do
     most_frequent_value=$(awk -F',' -v col="$col_index" 'NR>1 {a[$col]++} END {for (val in a) if (a[val]>max) {max=a[val]; most=val} print most}' "$CSV_FILE")
     echo "Column $col_index: Most frequent value = $most_frequent_value"
 done
-    ;;
-  6)
+}
+function option_6(){
 # Use awk to extract column names (header)
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 
@@ -152,24 +136,71 @@ for col_index in "${numeric_columns[@]}"; do
     echo "  Median: $median"
     echo "  Standard Deviation: $std_dev"
 done
-    ;;
-  7)
+}
+function option_7(){
 # Prompt the user for the filter condition
 read -p "Enter the filter condition (e.g., Unit Price > 400): " filter_condition
 
 # Extract and display matching rows and columns based on the filter condition
 awk -F',' -v filter="$filter_condition" 'NR==1 {print $1, $2} NR>1 && ('"$filter_condition"') {print $1, $2}' "$CSV_FILE"
-    ;;
-  8)
+}
+function option_8(){
 # Prompt the user for the column to sort by (e.g., "Total Profit")
 read -p "Enter the column to sort by (e.g., Total Profit): " sort_column
 
 # Sort the CSV file based on the specified column in ascending order
 tail -n +2 "$CSV_FILE" | sort -t$'\t' -k $(echo "$(head -n 1 "$CSV_FILE" | tr '\t' '\n' | grep -n "$sort_column" | cut -d':' -f1)")
-    ;;
-  0)
+}
+function option_0(){
     echo "Exiting..."
     clear
    exit
+}
+
+
+
+# Display the menu
+echo "Select an option:"
+echo "1. Display number of rows and columns"
+echo "2. List unique values in a specified column"
+echo "3. Display column names (header)"
+echo "4. Minimum and maximum values for numeric columns"
+echo "5. The most frequent value for categorical columns"
+echo "6. Calculating summary statistics (mean, median, standard deviation) for numeric columns"
+echo "7. Filtering and extracting rows and column based on user-defined conditions"
+echo "8. Sorting the CSV file based on a specific column"
+echo "0. Exit"
+
+# Get the user's choice
+read choice
+
+# Perform the selected operation
+case $choice in
+  1)
+option_1
+    ;;
+  2)
+option_2
+    ;;
+  3)
+option_3
+    ;;
+  4)
+option_4
+    ;;
+  5)
+option_5
+    ;;
+  6)
+option_6
+    ;;
+  7)
+option_7
+    ;;
+  8)
+option_8
+    ;;
+  0)
+option_0
     ;;
 esac
