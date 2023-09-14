@@ -20,8 +20,7 @@ echo "5. The most frequent value for categorical columns"
 echo "6. Calculating summary statistics (mean, median, standard deviation) for numeric columns"
 echo "7. Filtering and extracting rows and column based on user-defined conditions"
 echo "8. Sorting the CSV file based on a specific column"
-echo "9. Save the analysis results to a file"
-echo "10. Exit"
+echo "0. Exit"
 
 # Get the user's choice
 read choice
@@ -162,9 +161,15 @@ read -p "Enter the filter condition (e.g., Unit Price > 400): " filter_condition
 awk -F',' -v filter="$filter_condition" 'NR==1 {print $1, $2} NR>1 && ('"$filter_condition"') {print $1, $2}' "$CSV_FILE"
     ;;
   8)
-    echo "Sorting the CSV file based on a specific column..."
+# Prompt the user for the column to sort by (e.g., "Total Profit")
+read -p "Enter the column to sort by (e.g., Total Profit): " sort_column
+
+# Sort the CSV file based on the specified column in ascending order
+tail -n +2 "$CSV_FILE" | sort -t$'\t' -k $(echo "$(head -n 1 "$CSV_FILE" | tr '\t' '\n' | grep -n "$sort_column" | cut -d':' -f1)")
     ;;
   0)
     echo "Exiting..."
+    clear
+   exit
     ;;
 esac
