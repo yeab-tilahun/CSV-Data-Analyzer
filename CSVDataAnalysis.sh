@@ -157,50 +157,86 @@ function option_0(){
    exit
 }
 
+# Function to display the menu using dialog
+display_menu() {
+  dialog --clear --title "CSV File Operations" --menu "Select an option:" 15 40 9 \
+    1 "Display number of rows and columns" \
+    2 "List unique values in a specified column" \
+    3 "Display column names (header)" \
+    4 "Minimum and maximum values for numeric columns" \
+    5 "The most frequent value for categorical columns" \
+    6 "Calculating summary statistics (mean, median, standard deviation) for numeric columns" \
+    7 "Filtering and extracting rows and column based on user-defined conditions" \
+    8 "Sorting the CSV file based on a specific column" \
+    0 "Exit" 2>&1 >/dev/tty
+}
 
+# Main loop
+while true; do
+  # Display the menu and get the user's choice using dialog
+  CHOICE=$(display_menu)
 
-# Display the menu
-echo "Select an option:"
-echo "1. Display number of rows and columns"
-echo "2. List unique values in a specified column"
-echo "3. Display column names (header)"
-echo "4. Minimum and maximum values for numeric columns"
-echo "5. The most frequent value for categorical columns"
-echo "6. Calculating summary statistics (mean, median, standard deviation) for numeric columns"
-echo "7. Filtering and extracting rows and column based on user-defined conditions"
-echo "8. Sorting the CSV file based on a specific column"
-echo "0. Exit"
-
-# Get the user's choice
-read choice
-
-# Perform the selected operation
-case $choice in
-  1)
-option_1
-    ;;
-  2)
-option_2
-    ;;
-  3)
-option_3
-    ;;
-  4)
-option_4
-    ;;
-  5)
-option_5
-    ;;
-  6)
-option_6
-    ;;
-  7)
-option_7
-    ;;
-  8)
-option_8
-    ;;
-  0)
-option_0
-    ;;
-esac
+  # Perform the selected operation based on the user's choice
+  case $CHOICE in
+    1)
+      clear
+      option_1
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    2)
+      clear
+      option_2
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    3)
+      clear
+      option_3
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    4)
+      clear
+      option_4
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    5)
+      clear
+      option_5
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    6)
+      clear
+      option_6
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    7)
+      clear
+      option_7
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    8)
+      clear
+      option_8
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+    0)
+      clear
+      option_0
+      echo "Exiting the program."
+      exit 0
+      ;;
+    *)
+      clear
+      echo "Invalid option. Press any key to continue..."
+      read -n 1 -s -r
+      clear
+      ;;
+  esac
+done
