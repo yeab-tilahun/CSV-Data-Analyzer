@@ -2,9 +2,10 @@
 
 
 # Get the CSV file name from the user
-#echo "Enter the CSV file name to analyze: "
-#read CSV_FILE
-CSV_FILE="sales.csv"
+echo "Enter the CSV file name to analyze: "
+read CSV_FILE
+# CSV_FILE="sales.csv"
+
 # Create the output file if it doesn't exist
 if [ ! -f "$CSV_FILE" ]; then
   echo  "File doesn't exist:)"
@@ -18,6 +19,9 @@ num_columns=$(awk -F',' 'NR==1 {print NF}' "$CSV_FILE")
 # Display the results
 echo "Number of rows: $num_rows"
 echo "Number of columns: $num_columns"
+temp=$(echo -e "Number of rows: $num_rows\nNumber of columns: $num_columns.\n")
+
+option_9 "$temp"
 }
 
 function option_2(){
@@ -30,6 +34,9 @@ unique_values=$(awk -F',' -v col="$column_number" 'NR>1 {print $col}' "$CSV_FILE
 # Display the unique values
 echo "Unique values in column $column_number:"
 echo "$unique_values"
+temp=$(echo -e "Unique values in column $column_number:\n$unique_values\n")
+
+option_9 "$temp"
 }
 function option_3(){
 # Use awk to extract and display the header (first row)
@@ -38,6 +45,9 @@ header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 # Display the column names (header)
 echo "Column names (header):"
 echo "$header"
+temp=$(echo -e "Column names (header):\n$header\n")
+
+option_9 "$temp"
 }
 function option_4(){
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
@@ -57,10 +67,17 @@ done
 
 # Display min max for numeric columns
 echo "Min and Max values for numeric columns:"
+str1=$(echo -e "Min and Max values for numeric columns:\n:")
+temp="${str1}"
 for col_index in "${numeric_columns[@]}"; do
     min_max=$(awk -F',' -v col="$col_index" 'NR>1 {if (min=="") min=max=$col; if ($col<min) min=$col; if ($col>max) max=$col} END {print min, max}' "$CSV_FILE")
     echo "Column $col_index: Min = ${min_max%% *}, Max = ${min_max##* }"
+    str2=$(echo -e "Column $col_index: Min = ${min_max%% *}, Max = ${min_max##* }")
+    temp="${temp}"$'\n'"${str2}"
 done
+
+
+option_9 "$temp"
 }
 function option_5(){
 # Use awk to extract column names (header)
@@ -99,7 +116,8 @@ for ((i=1; i<=$(echo "$header" | awk -F',' '{print NF}'); i++)); do
         numeric_columns+=("$i")
     fi
 done
-
+str1=$(echo -e "Summary statistics (mean, median, standard deviation:)\n")
+temp="${str1}"
 # Calculate and display statistics for each numeric column
 for col_index in "${numeric_columns[@]}"; do
     column_data=$(awk -F',' -v col="$col_index" 'NR>1 {print $col}' "$CSV_FILE")
@@ -135,31 +153,99 @@ for col_index in "${numeric_columns[@]}"; do
     echo "  Mean: $mean"
     echo "  Median: $median"
     echo "  Standard Deviation: $std_dev"
+    str2=$(echo -e "Column $col_index:\n")
+    temp="${temp}"$'\n'"${str2}"
+    str2=$(echo -e "Mean: $mean\n")
+    temp="${temp}"$'\n'"${str2}"
+    str2=$(echo -e "Median: $median\n")
+    temp="${temp}"$'\n'"${str2}"
+    str2=$(echo -e "Standard Deviation: $std_dev\n")
+    temp="${temp}"$'\n'"${str2}"
 done
+option_9 "$temp"
 }
-function option_7(){
-# Prompt the user for the filter condition
-read -p "Enter the filter condition (e.g., Unit Price > 400): " filter_condition
+# function option_7(){
+# # Prompt the user for the filter condition
+# read -p "Enter the filter condition (e.g., \$1 = "Asia"): " filter_condition
 
-# Extract and display matching rows and columns based on the filter condition
-awk -F',' -v filter="$filter_condition" 'NR==1 {print $1, $2} NR>1 && ('"$filter_condition"') {print $1, $2}' "$CSV_FILE"
-}
-function option_8(){
-# Prompt the user for the column to sort by (e.g., "Total Profit")
-read -p "Enter the column to sort by (e.g., Total Profit): " sort_column
+# # Extract and display matching rows and columns based on the filter condition
+# awk -F',' -v filter="$filter_condition" 'NR==1 {print $1, $2} NR>1 && ('"$filter_condition"') {print $1, $2}' "$CSV_FILE"
 
-# Sort the CSV file based on the specified column in ascending order
-tail -n +2 "$CSV_FILE" | sort -t$'\t' -k $(echo "$(head -n 1 "$CSV_FILE" | tr '\t' '\n' | grep -n "$sort_column" | cut -d':' -f1)")
+
+# }
+function option_7() {
+    # Prompt the user for the filter condition
+    read -p "Enter the filter condition (e.g., \$1 = \"Asia\"): " filter_condition
+
+    # Use a variable to store the matching rows
+    matching_rows=$(awk -F',' -v filter="$filter_condition" 'NR==1 {print $1, $2} NR>1 && ('"$filter_condition"') {print $1, $2}' "$CSV_FILE")
+
+    # Check if any rows matched the filter
+    if [ -n "$matching_rows" ]; then
+        echo -e "\nMatching rows:\n"
+        # Display the matching rows stored in the variable
+        echo -e "$matching_rows\n"
+        str1=$(echo -e "Matching rows:\n")
+        str2=$(echo -e "$matching_rows\n")
+        temp="${str1}"$'\n'"${str2}"
+        option_9 "$temp"
+    else
+        echo "No matching rows found."
+    fi
 }
+
+function option_8() {
+    # Prompt the user for the column to sort by (e.g., "Total Profit")
+    read -p "Enter the column to sort by (e.g., Total Profit): " sort_column
+
+    # Sort the CSV data based on the specified column in ascending order
+    sorted_data=$(tail -n +2 "$CSV_FILE" | sort -t$'\t' -k $(echo "$(head -n 1 "$CSV_FILE" | tr '\t' '\n' | grep -n "$sort_column" | cut -d':' -f1)"))
+
+    # Check if the sorted data is not empty
+    if [ -n "$sorted_data" ]; then
+        echo "Sorted data based on '$sort_column' column in ascending order:"
+        # Display the sorted data
+        echo "$sorted_data"
+        str1=$(echo -e "\nSorted data based on '$sort_column' column in ascending order:\n")
+        str2=$(echo -e "\n$sorted_data")
+        temp="${str1}"$'\n'"${str2}"
+        option_9 "$temp"
+    else
+        echo "No data to sort or no matching column found."
+    fi
+}
+
 function option_0(){
     echo "Exiting..."
     clear
    exit
 }
 
+function option_9(){
+  #prompt user if they want to save the file
+  read -p "Do you want to save the output? (y/n): " save_file
+  if [ "$save_file" == "y" ]; then
+  #prompt user for the file name
+  read -p "Enter the file name: " file_name
+  touch $file_name
+  #echo "$1"
+  echo "$1" >> $file_name
+  echo "File saved successfully!"
+  dir="Backup"
+  mkdir -p $dir
+  timestamp=$(date +%Y%m%d%H%M%S)
+  backup_file="${dir}/backup_${timestamp}.tar.gz"
+  echo "Backup In Progress..."
+  tar -czf "$backup_file" "$file_name"
+  echo "Backup Complete!"
+  else
+    echo "File not saved!"
+  fi
+}
+
 # Function to display the menu using dialog
 display_menu() {
-  dialog --clear --title "CSV File Operations" --menu "Select an option:" 15 40 9 \
+  dialog --clear --title "CSV Data Analysis Tool" --menu "Select an option:" 20 100 9 \
     1 "Display number of rows and columns" \
     2 "List unique values in a specified column" \
     3 "Display column names (header)" \
@@ -234,7 +320,8 @@ while true; do
       ;;
     *)
       clear
-      echo "Invalid option. Press any key to continue..."
+      echo "Invalid option" 
+      echo "Press any key to continue..."
       read -n 1 -s -r
       clear
       ;;
