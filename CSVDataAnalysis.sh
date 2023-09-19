@@ -11,6 +11,7 @@ display_menu() {
     6 "Calculating summary statistics (mean, median, standard deviation) for numeric columns" \
     7 "Filtering and extracting rows and column based on user-defined conditions" \
     8 "Sorting the CSV file based on a specific column" \
+    9 "Help" \
     0 "Exit" 2>&1 >/dev/tty
 }
 # 2>&1 means redirect stderr to stdout, and >/dev/tty redirects stdout to the terminal
@@ -19,10 +20,8 @@ display_menu() {
 # CSV_FILE="sales.csv"
 CSV_FILE=$(zenity --title "Select CSV file" --file-selection)
 # Check the file if it doesn't exist
-if [ ! -f "$CSV_FILE" && -z "$CSV_FILE" ]; then
-  echo  "File doesn't exist or It is empty)"
-else 
-  display_menu
+if [ ! -f "$CSV_FILE"]; then
+  echo  "File doesn't exist)"
 fi
 
 
@@ -357,6 +356,13 @@ while true; do
       read -n 1 -s -r -p "Press any key to continue..."
       clear
       ;;
+    9)
+      path="README.md"
+      cat $path | less
+      read -n 1 -s -r -p "Press any key to continue..."
+      clear
+      ;;
+
     0)
       clear
       option_0
