@@ -8,7 +8,6 @@
 - [Options](#options)
 - [Using the Tool](#using-the-tool)
 - [Contributing](#contributing)
-- [License](#license)
 - [Acknowledgments](#acknowledgments)
 
 ## Overview
@@ -79,13 +78,9 @@ We welcome contributions from the community to make the CSV Data Analysis Tool e
 
 Your contributions are invaluable, and they help us create a tool that benefits a wider audience.
 
-## License
-
-This project is open-source and is licensed under the MIT License. You can find detailed information in the [LICENSE](LICENSE) file. We believe in open collaboration and encourage you to use, modify, and share this tool under the terms of the MIT License.
-
 ## Acknowledgments
 
-The CSV Data Analysis Tool was developed with a passion for simplifying data analysis tasks for CSV files. We'd like to extend our gratitude to the open-source community for its inspiration and support and ofcourse the one and only ChatGPT for helping us with the documentation.
+The CSV Data Analysis Tool was developed with a passion for simplifying data analysis tasks for CSV files. I'd like to extend my gratitude to the open-source community for its inspiration and support and ofcourse the one and only ChatGPT for helping me with the documentation.
 
-Thank you for being part of this journey, and we hope this tool proves to be a valuable asset in your data analysis endeavors.
+Thank you for being part of this journey, and I hope this tool proves to be a valuable asset in your data analysis endeavors.
 
