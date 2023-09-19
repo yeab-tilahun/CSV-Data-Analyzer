@@ -1,14 +1,28 @@
 #!/bin/bash
 
+# Function to display the menu using dialog
+display_menu() {
+  dialog --clear --title "CSV Data Analysis Tool" --menu "Select an option:" 20 100 9 \
+    1 "Display number of rows and columns" \
+    2 "List unique values in a specified column" \
+    3 "Display column names (header)" \
+    4 "Minimum and maximum values for numeric columns" \
+    5 "The most frequent value for categorical columns" \
+    6 "Calculating summary statistics (mean, median, standard deviation) for numeric columns" \
+    7 "Filtering and extracting rows and column based on user-defined conditions" \
+    8 "Sorting the CSV file based on a specific column" \
+    0 "Exit" 2>&1 >/dev/tty
+}
+# 2>&1 means redirect stderr to stdout, and >/dev/tty redirects stdout to the terminal
 
-# Get the CSV file name from the user
-echo "Enter the CSV file name to analyze: "
-read CSV_FILE
+# Get the CSV file from the user
 # CSV_FILE="sales.csv"
-
+CSV_FILE=$(zenity --title "Select CSV file" --file-selection)
 # Check the file if it doesn't exist
-if [ ! -f "$CSV_FILE" ]; then
-  echo  "File doesn't exist:)"
+if [ ! -f "$CSV_FILE" && -z "$CSV_FILE" ]; then
+  echo  "File doesn't exist or It is empty)"
+else 
+  display_menu
 fi
 
 
@@ -283,22 +297,9 @@ function option_9(){
   fi
 }
 
-# Function to display the menu using dialog
-display_menu() {
-  dialog --clear --title "CSV Data Analysis Tool" --menu "Select an option:" 20 100 9 \
-    1 "Display number of rows and columns" \
-    2 "List unique values in a specified column" \
-    3 "Display column names (header)" \
-    4 "Minimum and maximum values for numeric columns" \
-    5 "The most frequent value for categorical columns" \
-    6 "Calculating summary statistics (mean, median, standard deviation) for numeric columns" \
-    7 "Filtering and extracting rows and column based on user-defined conditions" \
-    8 "Sorting the CSV file based on a specific column" \
-    # 2>&1 means redirect stderr to stdout, and >/dev/tty redirects stdout to the terminal
-    0 "Exit" 2>&1 >/dev/tty
-}
 
-# Main loop
+
+# Main loop for the program
 while true; do
   # Display the menu and get the user's choice using dialog
   CHOICE=$(display_menu)
