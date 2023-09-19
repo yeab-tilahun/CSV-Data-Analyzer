@@ -69,7 +69,7 @@ option_9 "$temp"
 function option_4(){
 header=$(awk -F',' 'NR==1 {print}' "$CSV_FILE")
 
-# Initialize variables to store the column indices and numeric flags
+# Initialize array variables to store the column indices and numeric flags
 numeric_columns=()
 non_numeric_columns=()
 
@@ -294,6 +294,7 @@ display_menu() {
     6 "Calculating summary statistics (mean, median, standard deviation) for numeric columns" \
     7 "Filtering and extracting rows and column based on user-defined conditions" \
     8 "Sorting the CSV file based on a specific column" \
+    # 2>&1 means redirect stderr to stdout, and >/dev/tty redirects stdout to the terminal
     0 "Exit" 2>&1 >/dev/tty
 }
 
@@ -307,6 +308,9 @@ while true; do
     1)
       clear
       option_1
+      # -n 1 means read only one character,
+      # -s means don't echo the input, 
+      # -r means don't treat backslashes as special characters
       read -n 1 -s -r -p "Press any key to continue..."
       clear
       ;;

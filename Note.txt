@@ -1,0 +1,118 @@
+Here I'll explain the functions used in the script
+
+
+FUNCTION -1
+
+    num_rows=$(awk 'END {print NR}' "$CSV_FILE")
+    num_columns=$(awk -F',' 'NR==1 {print NF}' "$CSV_FILE")
+awk is a text processing utility in Unix systems used for pattern scanning and processing on text data.
+END {print NR} = calculates and prints the total number of rows in the CSV file. and 
+END - it intructs awk to execute till it reaches the end of the input file
+NR - represent the curren recored number which is the number of rows
+
+-F',' - specify the separetor delimeter is it , or . or tab?
+NF - represent the number of fields or num_columns
+
+FUNCTION -2
+
+unique_values=$(awk -F',' -v col="$column_number" 'NR>1 {print $col}' "$CSV_FILE" | sort -u)
+
+-v col="$col_num" - used to assign value for a variable named col
+NR>1 - checks if the line number is greather than 1 because 1 is the names of the columns
+{print $col} - when NR>1 condition is met it prints the vaule of the specified  by the col variable
+| sort -u - takes the result of the awk command and sort the values by removing duplicate lines
+
+FUNCTION -3
+
+Nothing new here
+
+FUNCTION -4
+
+echo "$header" | awk -F',' '{print NF}' - prints the number of fields in each the header
+ is_numeric=$(awk -F',' -v col="$i" 'NR>1 {if ($col ~ /^[0-9]+(\.[0-9]+)?$/) print "numeric"; else print "not_numeric"; exit}' "$CSV_FILE")
+    - checks if the value is numeric or not
+    - /^[0-9]+(\.[0-9]+)?$/ - is a regular expression to check if the value is numeric or not
+    - if the value is numeric it prints numeric else not_numeric
+    - exit - exits the awk command after the first line is processed
+ min_max=$(awk -F',' -v col="$col_index" 'NR>1 {if (min=="") min=max=$col; if ($col<min) min=$col; if ($col>max) max=$col} END {print min, max}' "$CSV_FILE")
+    - calculates the min and max value of the column
+    - if (min=="") min=max=$col; - checks if the min value is empty if it is empty it assigns 
+      the first value of the column to min and max
+    - if ($col<min) min=$col; - checks if the current value is less than the min value if it is 
+      less than it assigns the current value to min
+    - if ($col>max) max=$col} - checks if the current value is greater than the max value if it is
+        greater than it assigns the current value to max
+    - END {print min, max} - prints the min and max value of the column
+
+ echo "Column $col_index: Min = ${min_max%% *}, Max = ${min_max##* }"
+    - ${min_max%% *} - extrtacts the min value of the column from the min_max variable
+    - ${min_max##* } - extrtacts the max value of the column from the min_max variable
+ for col_index in "${numeric_columns[@]}";
+    - [@] to indicate that you want to treat each element as a separate item.
+
+
+FUNCTION -5
+
+most_frequent_value=$(awk -F',' -v col="$col_index" 'NR>1 {a[$col]++} END {for (val in a) if (a[val]>max) {max=a[val]; most=val} print most}' "$CSV_FILE")
+    - a[$col]++ - creates an array with the value of the column as the key and the number of times it appears as the value
+    - END {for (val in a) if (a[val]>max) {max=a[val]; most=val} print most} - loops through the array and checks if the value
+      is greater than the max value if it is greater than the max value it assigns the value to max and the key to most
+
+FUNCTION -6
+ 
+ IFS=$'\n' read -ra values <<< "$column_data"
+    - Setting IFS: IFS=$'\n' sets the IFS variable to newline characters. By doing this, when the read command is used to read data 
+      from the column_data variable into the values array, it treats each newline-separated item as a separate element in the array. 
+    - read -ra - reads the input and stores it in an array
+    - <<< - here string redirection
+    - "$column_data" - the input to be read
+ num_values=${#values[@]}
+    - ${#values[@]} - returns the number of elements in the array
+ bc
+    - bc is a command line calculator
+
+
+FUNCTION -7
+ 
+ -v filter="$filter_condition"
+    - -v filter="$filter_condition" - assigns the value of the filter_condition variable to the filter variable
+    - filter_condition - is the value of the filter condition
+ 'NR==1 {print $1, $2}' - used to display column headers or names
+    - NR==1 - checks if the line number is 1
+    - {print $1, $2} - if the line number is 1 it prints the first and second column
+ NR>1 && ('"$filter_condition"') {print $1, $2}
+    - is used for lines where the record number (NR) is greater than 1 (meaning it's not the first line) 
+      and where the provided filter_condition is true.
+    - '"$filter_condition"' checks whether the provided filter_condition is true for the current line.
+
+
+FUNCTION -8
+
+ tail -n +2 "$CSV_FILE"
+    - tail -n +2 - prints the file starting from the second line
+    - $CSV_FILE - the file to be printed
+ sort -t$'\t' -k $(echo "$(head -n 1 "$CSV_FILE"))
+    - sort -t$'\t' -k - sorts the file based on the specified column
+    - $(echo "$(head -n 1 "$CSV_FILE")) - gets the column name from the first line of the file
+    - $'\t' - tab is the delimeter
+    - -k - specifies the column to be sorted
+    - head -n 1 - gets the first line of the file
+    - $CSV_FILE - the file to be sorted
+ tr '\t' '\n'
+    - tr '\t' '\n' - replaces the tab with a new line
+ grep -n "$sort_column"
+    - grep -n - prints the line number of the specified column
+    - $sort_column - the column to be sorted
+ cut -d':' -f1
+    - cut -d':' -f1 - cuts the line number from the output of the grep command
+    - -d':' - specifies the delimeter
+    - -f1 - specifies the field to be cut
+
+FUNCTION -0
+
+Nothing new here it just exits the script
+
+
+FUNCTION -9
+
+Nothing new here it just takes file name and save output then backup the file
