@@ -16,12 +16,19 @@ display_menu() {
 }
 # 2>&1 means redirect stderr to stdout, and >/dev/tty redirects stdout to the terminal
 
-# Get the CSV file from the user
-# CSV_FILE="sales.csv"
+# Select CSV file using Zenity
 CSV_FILE=$(zenity --title "Select CSV file" --file-selection)
-# Check the file if it doesn't exist
-if [ ! -f "$CSV_FILE"]; then
-  echo  "File doesn't exist)"
+
+# Check if the file exists
+if [ ! -f "$CSV_FILE" ]; then
+  zenity --error --text="File doesn't exist."
+  exit 1
+fi
+
+# Check if the file has the .csv extension
+if [[ "$CSV_FILE" != *.csv ]]; then
+  zenity --error --text="Selected file is not a CSV file."
+  exit 1
 fi
 
 
@@ -185,9 +192,9 @@ for col_index in "${numeric_columns[@]}"; do
             sq_diff=$(echo "$diff * $diff" | bc)
             sum_sq=$(echo "$sum_sq + $sq_diff" | bc)
         done
-        std_dev=$(echo "scale=2; sqrt($sum_sq / ($num_values - 1))" | bc)
-    else
-        std_dev="N/A"
+        std_dev=$(echo "scale=2; sqrt($mean / ($num_values - 1))" | bc)
+    # else
+    #     std_dev="N/A"
     fi
 
     echo "Column $col_index:"
